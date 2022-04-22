@@ -95,7 +95,9 @@ function await_block_sync() {
 await_block_sync
 
 # Start LN gateway
+$BIN_DIR/clientd $CFG_DIR &
 $BIN_DIR/ln_gateway $CFG_DIR &
+RPC="http://127.0.0.1:8081/rpc"
 
 #### BEGIN TESTS ####
 # peg in
@@ -133,9 +135,6 @@ INVOICE_RESULT="$($LN2 waitinvoice test)"
 INVOICE_STATUS="$(echo $INVOICE_RESULT | jq -r '.status')"
 [[ "$INVOICE_STATUS" = "paid" ]]
 #CLIENTD
-#stard clientd
-$BIN_DIR/clientd $CFG_DIR &
-RPC="http://127.0.0.1:8081/rpc"
 #JSON-RPC Specification
 #TODO: Notification: no ID means the client does not want any response (reissue for example)
 #rpc call of non-existent method:
