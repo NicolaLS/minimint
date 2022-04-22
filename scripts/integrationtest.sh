@@ -97,6 +97,41 @@ await_block_sync
 # Start LN gateway
 $BIN_DIR/ln_gateway $CFG_DIR &
 
+#### BEGIN TESTS ####
+# peg in
+PEG_IN_ADDR="$($MINT_CLIENT peg-in-address)"
+TX_ID="$($BTC_CLIENT sendtoaddress $PEG_IN_ADDR 0.00099999)"
+
+# Confirm peg-in
+mine_blocks 11
+await_block_sync
+TXOUT_PROOF="$($BTC_CLIENT gettxoutproof "[\"$TX_ID\"]")"
+TRANSACTION="$($BTC_CLIENT getrawtransaction $TX_ID)"
+$MINT_CLIENT peg-in "$TXOUT_PROOF" "$TRANSACTION"
+$MINT_CLIENT fetch
+
+# reissue
+TOKENS=$($MINT_CLIENT spend 42000)
+$MINT_CLIENT reissue $TOKENS
+$MINT_CLIENT fetch
+
+# peg out
+PEG_OUT_ADDR="$($BTC_CLIENT getnewaddress)"
+$MINT_CLIENT peg-out $PEG_OUT_ADDR "500 sat"
+sleep 5 # wait for tx to be included
+mine_blocks 120
+await_block_sync
+sleep 15
+mine_blocks 10
+RECEIVED=$($BTC_CLIENT getreceivedbyaddress $PEG_OUT_ADDR)
+[[ "$RECEIVED" = "0.00000500" ]]
+
+# outgoing lightning
+INVOICE="$($LN2 invoice 100000 test test 1m | jq -r '.bolt11')"
+$MINT_CLIENT ln-pay $INVOICE
+INVOICE_RESULT="$($LN2 waitinvoice test)"
+INVOICE_STATUS="$(echo $INVOICE_RESULT | jq -r '.status')"
+[[ "$INVOICE_STATUS" = "paid" ]]
 #CLIENTD
 #stard clientd
 $BIN_DIR/clientd $CFG_DIR &
