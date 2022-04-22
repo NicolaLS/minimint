@@ -133,6 +133,7 @@ $MINT_CLIENT ln-pay $INVOICE
 INVOICE_RESULT="$($LN2 waitinvoice test)"
 INVOICE_STATUS="$(echo $INVOICE_RESULT | jq -r '.status')"
 [[ "$INVOICE_STATUS" = "paid" ]]
+
 $BIN_DIR/clientd $CFG_DIR &
 RPC="http://127.0.0.1:8081/rpc"
 #CLIENTD
