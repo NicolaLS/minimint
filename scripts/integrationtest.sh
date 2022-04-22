@@ -136,6 +136,7 @@ INVOICE_STATUS="$(echo $INVOICE_RESULT | jq -r '.status')"
 
 $BIN_DIR/clientd $CFG_DIR &
 RPC="http://127.0.0.1:8081/rpc"
+sleep 15
 #CLIENTD
 #JSON-RPC Specification
 #TODO: Notification: no ID means the client does not want any response (reissue for example)
