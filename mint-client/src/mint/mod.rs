@@ -9,6 +9,7 @@ use minimint::modules::mint::tiered::coins::Coins;
 use minimint::modules::mint::{
     BlindToken, Coin, CoinNonce, InvalidAmountTierError, Keys, SigResponse, SignRequest,
 };
+use minimint::outcome::{OutputOutcome, TransactionStatus};
 use minimint_api::db::batch::{BatchItem, BatchTx};
 use minimint_api::encoding::{Decodable, Encodable};
 use minimint_api::{Amount, OutPoint, TransactionId};
@@ -231,18 +232,27 @@ impl<'c> MintClient<'c> {
         // TODO: return out points instead
         let mut tx_ids = vec![];
         for (OutputFinalizationKey(out_point), _) in active_issuances {
-            loop {
-                match self.fetch_coins(batch.subtransaction(), out_point).await {
-                    Ok(()) => {
-                        tx_ids.push(out_point.txid);
-                        break;
+            'outer: loop {
+                if let Ok(status) = self.context.api.fetch_tx_outcome(out_point.txid).await {
+                    if let TransactionStatus::Accepted { outputs, .. } = status {
+                        for o in outputs {
+                            if let OutputOutcome::Mint(None) = o {
+                                continue 'outer;
+                            }
+                        }
+                        match self.fetch_coins(batch.subtransaction(), out_point).await {
+                            Ok(()) => {
+                                tx_ids.push(out_point.txid);
+                                break;
+                            }
+                            // TODO: make mint error more expressive (currently any HTTP error) and maybe use custom return type instead of error for retrying
+                            Err(e) if e.is_retryable_fetch_coins() => {
+                                trace!("Mint returned retryable error: {:?}", e);
+                                tokio::time::sleep(Duration::from_secs(1)).await
+                            }
+                            Err(e) => return Err(e),
+                        }
                     }
-                    // TODO: make mint error more expressive (currently any HTTP error) and maybe use custom return type instead of error for retrying
-                    Err(e) if e.is_retryable_fetch_coins() => {
-                        trace!("Mint returned retryable error: {:?}", e);
-                        tokio::time::sleep(Duration::from_secs(1)).await
-                    }
-                    Err(e) => return Err(e),
                 }
             }
         }
