@@ -229,12 +229,12 @@
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MemDatabase</span>;
     <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">test_log::test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_basic_rw</span>() {
         <span class="kw">let</span> <span class="ident">mem_db</span> <span class="op">=</span> <span class="ident">MemDatabase::new</span>();
         <span class="ident"><span class="kw">crate</span>::db::tests::test_db_impl</span>(<span class="ident">Arc::new</span>(<span class="ident">mem_db</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="minimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c52b9c10b 2022-05-16)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="minimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c06728704 2022-05-19)" ></div>
 </body></html>
