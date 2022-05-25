@@ -5,6 +5,7 @@ use minimint::modules::mint::tiered::coins::Coins;
 use minimint_api::Amount;
 use serde::Deserialize;
 
+const NO_BATCH_DEFAULT: &str = "1";
 struct JsonRpc {
     client: reqwest::Client,
     host: String,
@@ -49,79 +50,105 @@ impl JsonRpc {
         }
     }
     #[allow(dead_code)]
-    pub async fn get_info<T: serde::Serialize>(
-        &self,
-        id: std::option::Option<T>, //<- IDK why I have to specify this
-    ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard("info", id)).await
+    pub async fn get_info<T: serde::Serialize>(&self) -> Result<APIResponse, Option<RpcError>> {
+        self.call(Request::standard("info", Some(NO_BATCH_DEFAULT)))
+            .await
     }
     #[allow(dead_code)]
-    pub async fn get_pending<T: serde::Serialize>(
-        &self,
-        id: std::option::Option<T>,
-    ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard("pending", id)).await
+    pub async fn get_pending<T: serde::Serialize>(&self) -> Result<APIResponse, Option<RpcError>> {
+        self.call(Request::standard("pending", Some(NO_BATCH_DEFAULT)))
+            .await
     }
     #[allow(dead_code)]
     pub async fn get_events<T: serde::Serialize>(
         &self,
         params: u64,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard_with_params("events", params, id))
-            .await
+        self.call(Request::standard_with_params(
+            "events",
+            params,
+            Some(NO_BATCH_DEFAULT),
+        ))
+        .await
     }
     #[allow(dead_code)]
     pub async fn get_new_pegin_address<T: serde::Serialize>(
         &self,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard("pegin_address", id)).await
+        self.call(Request::standard("pegin_address", Some(NO_BATCH_DEFAULT)))
+            .await
     }
     #[allow(dead_code)]
     pub async fn peg_in<T: serde::Serialize>(
         &self,
         params: PegInReq,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard_with_params("pegin", params, id))
-            .await
+        self.call(Request::standard_with_params(
+            "pegin",
+            params,
+            Some(NO_BATCH_DEFAULT),
+        ))
+        .await
     }
     #[allow(dead_code)]
     pub async fn peg_out<T: serde::Serialize>(
         &self,
         params: PegOutReq,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard_with_params("pegout", params, id))
-            .await
+        self.call(Request::standard_with_params(
+            "pegout",
+            params,
+            Some(NO_BATCH_DEFAULT),
+        ))
+        .await
     }
     #[allow(dead_code)]
     pub async fn spend<T: serde::Serialize>(
         &self,
         params: Amount,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard_with_params("spend", params.milli_sat, id))
-            .await
+        self.call(Request::standard_with_params(
+            "spend",
+            params.milli_sat,
+            Some(NO_BATCH_DEFAULT),
+        ))
+        .await
     }
     #[allow(dead_code)]
     pub async fn lnpay<T: serde::Serialize>(
         &self,
         params: InvoiceReq,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard_with_params("lnpay", params, id))
-            .await
+        self.call(Request::standard_with_params(
+            "lnpay",
+            params,
+            Some(NO_BATCH_DEFAULT),
+        ))
+        .await
     }
     #[allow(dead_code)]
     pub async fn reissue<T: serde::Serialize>(
         &self,
         params: Coins<SpendableCoin>,
-        id: std::option::Option<T>,
     ) -> Result<APIResponse, Option<RpcError>> {
-        self.call(Request::standard_with_params("reissue", params, id))
-            .await
+        self.call(Request::standard_with_params(
+            "reissue",
+            params,
+            Option::<()>::None,
+        ))
+        .await
+    }
+    #[allow(dead_code)]
+    pub async fn reissue_validate<T: serde::Serialize>(
+        &self,
+        params: Coins<SpendableCoin>,
+    ) -> Result<APIResponse, Option<RpcError>> {
+        self.call(Request::standard_with_params(
+            "reissue",
+            params,
+            Some(NO_BATCH_DEFAULT),
+        ))
+        .await
     }
 }
 impl Default for JsonRpc {
