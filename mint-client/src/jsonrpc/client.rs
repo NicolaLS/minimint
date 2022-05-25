@@ -26,23 +26,25 @@ impl JsonRpc {
             .await
             .map_err(|_| None)?;
 
-        //this looks messy..maybe use if let result ? if let error etc..
-        match response.json::<Response>().await {
-            Ok(Response {
-                result: Some(result),
-                error: None,
-                ..
-            }) => Ok(APIResponse::deserialize(result)
-                .expect("the result is build from an APIResponse so it can't fail to deserialize")),
-            Ok(Response {
-                result: None,
-                error: Some(error),
-                ..
-            }) => Err(Some(error)),
-            Err(_) => panic!("a successful call to the json rpc should always return valid json"),
-            _ => {
-                //It was a notification so nothing was returned
-                Ok(APIResponse::Empty)
+        //note: not using response.json since it would consume response and it would demand different approach bellow
+        let response = response.bytes().await.map_err(|_| None)?;
+        if let Ok(serde_json::Value::Null) = serde_json::from_slice(&response) {
+            //notification 'null' response
+            Ok(APIResponse::Empty)
+        } else {
+            //non-notification with ...
+            match serde_json::from_slice::<Response>(&response) {
+                //... a result
+                Ok(Response {
+                    result: Some(result),
+                    ..
+                }) => Ok(APIResponse::deserialize(result).expect("can't fail")),
+                //.. an error
+                Ok(Response {
+                    error: Some(error), ..
+                }) => Err(Some(error)),
+                //either not a valid Response object OR a valid response with neither a result or error
+                _ => panic!("this should not be reached"),
             }
         }
     }
