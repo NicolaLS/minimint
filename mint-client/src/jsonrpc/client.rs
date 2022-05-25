@@ -6,7 +6,7 @@ use minimint_api::Amount;
 use serde::Deserialize;
 
 const NO_BATCH_DEFAULT: &str = "1";
-struct JsonRpc {
+pub struct JsonRpc {
     client: reqwest::Client,
     host: String,
 }
