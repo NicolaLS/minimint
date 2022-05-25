@@ -50,20 +50,17 @@ impl JsonRpc {
         }
     }
     #[allow(dead_code)]
-    pub async fn get_info<T: serde::Serialize>(&self) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn get_info(&self) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard("info", Some(NO_BATCH_DEFAULT)))
             .await
     }
     #[allow(dead_code)]
-    pub async fn get_pending<T: serde::Serialize>(&self) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn get_pending(&self) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard("pending", Some(NO_BATCH_DEFAULT)))
             .await
     }
     #[allow(dead_code)]
-    pub async fn get_events<T: serde::Serialize>(
-        &self,
-        params: u64,
-    ) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn get_events(&self, params: u64) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params(
             "events",
             params,
@@ -72,17 +69,12 @@ impl JsonRpc {
         .await
     }
     #[allow(dead_code)]
-    pub async fn get_new_pegin_address<T: serde::Serialize>(
-        &self,
-    ) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn get_new_pegin_address(&self) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard("pegin_address", Some(NO_BATCH_DEFAULT)))
             .await
     }
     #[allow(dead_code)]
-    pub async fn peg_in<T: serde::Serialize>(
-        &self,
-        params: PegInReq,
-    ) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn peg_in(&self, params: PegInReq) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params(
             "pegin",
             params,
@@ -91,10 +83,7 @@ impl JsonRpc {
         .await
     }
     #[allow(dead_code)]
-    pub async fn peg_out<T: serde::Serialize>(
-        &self,
-        params: PegOutReq,
-    ) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn peg_out(&self, params: PegOutReq) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params(
             "pegout",
             params,
@@ -103,10 +92,7 @@ impl JsonRpc {
         .await
     }
     #[allow(dead_code)]
-    pub async fn spend<T: serde::Serialize>(
-        &self,
-        params: Amount,
-    ) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn spend(&self, params: Amount) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params(
             "spend",
             params.milli_sat,
@@ -115,10 +101,7 @@ impl JsonRpc {
         .await
     }
     #[allow(dead_code)]
-    pub async fn lnpay<T: serde::Serialize>(
-        &self,
-        params: InvoiceReq,
-    ) -> Result<APIResponse, Option<RpcError>> {
+    pub async fn lnpay(&self, params: InvoiceReq) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params(
             "lnpay",
             params,
@@ -127,7 +110,7 @@ impl JsonRpc {
         .await
     }
     #[allow(dead_code)]
-    pub async fn reissue<T: serde::Serialize>(
+    pub async fn reissue(
         &self,
         params: Coins<SpendableCoin>,
     ) -> Result<APIResponse, Option<RpcError>> {
@@ -139,7 +122,7 @@ impl JsonRpc {
         .await
     }
     #[allow(dead_code)]
-    pub async fn reissue_validate<T: serde::Serialize>(
+    pub async fn reissue_validate(
         &self,
         params: Coins<SpendableCoin>,
     ) -> Result<APIResponse, Option<RpcError>> {
