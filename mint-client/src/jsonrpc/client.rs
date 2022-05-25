@@ -17,14 +17,14 @@ impl JsonRpc {
         }
     }
 
-    async fn call(&self, request_object: Request) -> Result<APIResponse, RpcError> {
+    async fn call(&self, request_object: Request) -> Result<APIResponse, Option<RpcError>> {
         let response = self
             .client
             .post(self.host.as_str())
             .json(&request_object)
             .send()
             .await
-            .unwrap(); //TODO: handle error ?
+            .map_err(|_| None)?;
 
         //this looks messy..maybe use if let result ? if let error etc..
         match response.json::<Response>().await {
@@ -38,7 +38,7 @@ impl JsonRpc {
                 result: None,
                 error: Some(error),
                 ..
-            }) => Err(error),
+            }) => Err(Some(error)),
             Err(_) => panic!("a successful call to the json rpc should always return valid json"),
             _ => {
                 //It was a notification so nothing was returned
@@ -50,14 +50,14 @@ impl JsonRpc {
     pub async fn get_info<T: serde::Serialize>(
         &self,
         id: std::option::Option<T>, //<- IDK why I have to specify this
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard("info", id)).await
     }
     #[allow(dead_code)]
     pub async fn get_pending<T: serde::Serialize>(
         &self,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard("pending", id)).await
     }
     #[allow(dead_code)]
@@ -65,7 +65,7 @@ impl JsonRpc {
         &self,
         params: u64,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params("events", params, id))
             .await
     }
@@ -73,7 +73,7 @@ impl JsonRpc {
     pub async fn get_new_pegin_address<T: serde::Serialize>(
         &self,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard("pegin_address", id)).await
     }
     #[allow(dead_code)]
@@ -81,7 +81,7 @@ impl JsonRpc {
         &self,
         params: PegInReq,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params("pegin", params, id))
             .await
     }
@@ -90,7 +90,7 @@ impl JsonRpc {
         &self,
         params: PegOutReq,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params("pegout", params, id))
             .await
     }
@@ -99,7 +99,7 @@ impl JsonRpc {
         &self,
         params: Amount,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params("spend", params.milli_sat, id))
             .await
     }
@@ -108,7 +108,7 @@ impl JsonRpc {
         &self,
         params: InvoiceReq,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params("lnpay", params, id))
             .await
     }
@@ -117,7 +117,7 @@ impl JsonRpc {
         &self,
         params: Coins<SpendableCoin>,
         id: std::option::Option<T>,
-    ) -> Result<APIResponse, RpcError> {
+    ) -> Result<APIResponse, Option<RpcError>> {
         self.call(Request::standard_with_params("reissue", params, id))
             .await
     }
