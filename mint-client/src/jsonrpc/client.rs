@@ -1,5 +1,5 @@
 use crate::jsonrpc::errors::RpcError;
-use crate::jsonrpc::json::{APIResponse, PegInReq, PegOutReq, Request, Response};
+use crate::jsonrpc::json::{APIResponse, InvoiceReq, PegInReq, PegOutReq, Request, Response};
 use crate::mint::SpendableCoin;
 use minimint::modules::mint::tiered::coins::Coins;
 use minimint_api::Amount;
@@ -103,8 +103,6 @@ impl JsonRpc {
         self.call(Request::standard_with_params("spend", params.milli_sat, id))
             .await
     }
-    //TODO: impl serialize for InvoiceReq
-    /*
     #[allow(dead_code)]
     pub async fn lnpay<T: serde::Serialize>(
         &self,
@@ -113,7 +111,7 @@ impl JsonRpc {
     ) -> Result<APIResponse, RpcError> {
         self.call(Request::standard_with_params("lnpay", params, id))
             .await
-    }*/
+    }
     #[allow(dead_code)]
     pub async fn reissue<T: serde::Serialize>(
         &self,
