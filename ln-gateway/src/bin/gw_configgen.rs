@@ -1,9 +1,9 @@
 use clap::Parser;
+use client_lib::clients::gateway::GatewayClientConfig;
+use client_lib::ln::gateway::LightningGateway;
+use client_lib::ClientAndGatewayConfig;
 use ln_gateway::LnGatewayConfig;
 use minimint::config::load_from_file;
-use mint_client::clients::gateway::GatewayClientConfig;
-use mint_client::ln::gateway::LightningGateway;
-use mint_client::ClientAndGatewayConfig;
 use rand::thread_rng;
 use secp256k1::PublicKey;
 use std::path::PathBuf;

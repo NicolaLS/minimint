@@ -1,13 +1,13 @@
 use bitcoin::{Address, Transaction};
 use bitcoin_hashes::hex::ToHex;
 use clap::Parser;
+use client_lib::mint::SpendableCoin;
+use client_lib::{ClientAndGatewayConfig, UserClient};
 use minimint::config::load_from_file;
 use minimint::modules::mint::tiered::coins::Coins;
 use minimint::modules::wallet::txoproof::TxOutProof;
 use minimint_api::encoding::Decodable;
 use minimint_api::Amount;
-use mint_client::mint::SpendableCoin;
-use mint_client::{ClientAndGatewayConfig, UserClient};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::path::PathBuf;

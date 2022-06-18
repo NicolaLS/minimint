@@ -1,9 +1,9 @@
 pub mod ln;
 
 use crate::ln::{LightningError, LnRpc};
+use client_lib::clients::gateway::{GatewayClient, GatewayClientConfig, GatewayClientError};
 use minimint::modules::ln::contracts::ContractId;
 use minimint_api::{db::Database, OutPoint};
-use mint_client::clients::gateway::{GatewayClient, GatewayClientConfig, GatewayClientError};
 use rand::{CryptoRng, RngCore};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;

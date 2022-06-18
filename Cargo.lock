@@ -651,6 +651,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "cli"
+version = "0.1.0"
+
+[[package]]
+name = "client-lib"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "base64 0.13.0",
+ "bincode",
+ "bitcoin",
+ "bitcoin_hashes",
+ "clap",
+ "futures",
+ "hex",
+ "lightning",
+ "lightning-invoice",
+ "minimint",
+ "minimint-api",
+ "miniscript",
+ "rand 0.6.5",
+ "reqwest",
+ "secp256k1-zkp",
+ "serde",
+ "sha3",
+ "sled",
+ "tbs",
+ "test-log",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "clientd"
+version = "0.1.0"
+
+[[package]]
 name = "clightningrpc"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1367,9 +1406,9 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff8670570af52249509a86f5e3e18a08c60b177071826898fde8997cf5f6bfbb"
+checksum = "75f43d41e26995c17e71ee126451dd3941010b0514a81a9d11f3b341debc2399"
 dependencies = [
  "bytes",
  "fnv",
@@ -1378,9 +1417,9 @@ dependencies = [
 
 [[package]]
 name = "http-body"
-version = "0.4.4"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ff4f84919677303da5f147645dbea6b1881f368d03ac84e1dc09031ebd7b2c6"
+checksum = "d5f38f16d184e36f2408a55281cd658ecbd3ca05cce6d6510a176eca393e26d1"
 dependencies = [
  "bytes",
  "http",
@@ -1444,9 +1483,9 @@ dependencies = [
 
 [[package]]
 name = "hyper"
-version = "0.14.18"
+version = "0.14.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b26ae0a80afebe130861d90abf98e3814a4f28a4c6ffeb5ab8ebb2be311e0ef2"
+checksum = "42dc3c131584288d375f2d07f822b0cb012d8c6fb899a5b9fdb3cb7eb9b6004f"
 dependencies = [
  "bytes",
  "futures-channel",
@@ -1619,13 +1658,13 @@ dependencies = [
  "async-std",
  "async-trait",
  "clap",
+ "client-lib",
  "cln-rpc",
  "futures",
  "hex",
  "lightning-invoice",
  "minimint",
  "minimint-api",
- "mint-client",
  "rand 0.6.5",
  "secp256k1",
  "serde",
@@ -1904,6 +1943,7 @@ dependencies = [
  "bitcoin",
  "bitcoin_hashes",
  "clap",
+ "client-lib",
  "futures",
  "hex",
  "lightning",
@@ -2613,9 +2653,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.11.10"
+version = "0.11.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46a1f7aa4f35e5e8b4160449f51afc758f0ce6454315a9fa7d0d113e958c41eb"
+checksum = "b75aa69a3f06bbcc66ede33af2af253c6f7a86b1ca0033f60c580a27074fbf92"
 dependencies = [
  "base64 0.13.0",
  "bytes",
@@ -2637,6 +2677,7 @@ dependencies = [
  "serde_json",
  "serde_urlencoded",
  "tokio",
+ "tower-service",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -3360,9 +3401,9 @@ dependencies = [
 
 [[package]]
 name = "tower-service"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "360dfd1d6d30e05fda32ace2c8c70e9c0a9da713275777f5a4dbb8a1893930c6"
+checksum = "b6bc1c9ce2b5135ac7f93c72918fc37feb872bdc6a5533a8b85eb4b86bfdae52"
 
 [[package]]
 name = "tracing"
