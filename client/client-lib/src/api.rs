@@ -4,7 +4,7 @@ use minimint::modules::ln::contracts::ContractId;
 use minimint::modules::ln::ContractAccount;
 use minimint::outcome::{MismatchingVariant, TransactionStatus, TryIntoOutcome};
 use minimint::transaction::Transaction;
-use minimint_api::{OutPoint, PeerId, TransactionId};
+use minimint_api::{task, OutPoint, PeerId, TransactionId};
 use reqwest::{StatusCode, Url};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -59,12 +59,12 @@ impl<'a> dyn FederationApi + 'a {
             loop {
                 match self.fetch_output_outcome(outpoint).await {
                     Ok(t) => return Ok(t),
-                    Err(e) if e.is_retryable_fetch_coins() => tokio::time::sleep(interval).await,
+                    Err(e) if e.is_retryable_fetch_coins() => task::sleep(interval).await,
                     Err(e) => return Err(e),
                 }
             }
         };
-        tokio::time::timeout(timeout, poll())
+        task::timeout(timeout, poll())
             .await
             .map_err(|_| ApiError::Timeout)?
     }

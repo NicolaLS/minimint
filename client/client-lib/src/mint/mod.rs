@@ -13,7 +13,7 @@ use minimint::modules::mint::{
 use minimint::transaction::{Output, Transaction};
 use minimint_api::db::batch::{BatchItem, BatchTx};
 use minimint_api::encoding::{Decodable, Encodable};
-use minimint_api::{Amount, OutPoint, TransactionId};
+use minimint_api::{task, Amount, OutPoint, TransactionId};
 use rand::{CryptoRng, Rng, RngCore};
 use secp256k1_zkp::{Secp256k1, Signing};
 use serde::{Deserialize, Serialize};
@@ -256,7 +256,7 @@ impl<'c> MintClient<'c> {
                     // TODO: make mint error more expressive (currently any HTTP error) and maybe use custom return type instead of error for retrying
                     Err(e) if e.is_retryable_fetch_coins() => {
                         trace!("Mint returned retryable error: {:?}", e);
-                        tokio::time::sleep(Duration::from_secs(1)).await
+                        task::sleep(Duration::from_secs(1)).await
                     }
                     Err(e) => return Err(e),
                 }
