@@ -1,7 +1,15 @@
-use minimint_api::Amount;
+use bitcoin::Transaction;
+use minimint_api::{Amount, TransactionId};
 use minimint_core::modules::mint::tiered::coins::Coins;
+use minimint_core::modules::wallet::txoproof::TxOutProof;
 use mint_client::mint::{CoinFinalizationData, SpendableCoin};
 use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Clone, Debug)]
+pub struct PeginPayload {
+    pub txout_proof: TxOutProof,
+    pub transaction: Transaction,
+}
 
 #[derive(Serialize)]
 pub struct InfoResponse {
@@ -26,6 +34,11 @@ pub struct PendingResponse {
 #[derive(Serialize)]
 pub struct PeginAddressResponse {
     pegin_address: bitcoin::Address,
+}
+
+#[derive(Serialize)]
+pub struct PegInOutResponse {
+    txid: TransactionId,
 }
 
 impl InfoResponse {
@@ -60,5 +73,11 @@ impl PendingResponse {
 impl PeginAddressResponse {
     pub fn new(pegin_address: bitcoin::Address) -> Self {
         Self { pegin_address }
+    }
+}
+
+impl PegInOutResponse {
+    pub fn new(txid: TransactionId) -> Self {
+        Self { txid }
     }
 }

@@ -743,6 +743,7 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "bitcoin",
+ "bitcoin_hashes",
  "clap",
  "minimint-api",
  "minimint-core",

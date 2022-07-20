@@ -20,3 +20,4 @@ tower = "0.4.13"
 tower-http = { version = "0.3.4", features = [ "trace" ] }
 rand = "0.6.5"
 bitcoin = { version = "0.28.1", features = [ "serde" ] }
+bitcoin_hashes = "0.10.0"
