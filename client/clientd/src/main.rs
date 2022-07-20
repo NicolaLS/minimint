@@ -2,7 +2,7 @@ use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::{Extension, Json, Router, Server};
 use clap::Parser;
-use clientd::InfoResponse;
+use clientd::{InfoResponse, PendingResponse};
 use minimint_core::config::load_from_file;
 use mint_client::{Client, UserClientConfig};
 use std::path::PathBuf;
@@ -39,16 +39,19 @@ async fn main() {
     let client = Client::new(cfg.clone(), Box::new(db), Default::default()).await;
 
     let shared_state = Arc::new(State { client });
-    let app = Router::new().route("/getInfo", post(info)).layer(
-        ServiceBuilder::new()
-            .layer(
-                TraceLayer::new_for_http()
-                    .make_span_with(DefaultMakeSpan::new().include_headers(true))
-                    .on_request(DefaultOnRequest::new().level(Level::INFO))
-                    .on_response(DefaultOnResponse::new().level(Level::INFO)),
-            )
-            .layer(Extension(shared_state)),
-    );
+    let app = Router::new()
+        .route("/getInfo", post(info))
+        .route("/getPending", post(pending))
+        .layer(
+            ServiceBuilder::new()
+                .layer(
+                    TraceLayer::new_for_http()
+                        .make_span_with(DefaultMakeSpan::new().include_headers(true))
+                        .on_request(DefaultOnRequest::new().level(Level::INFO))
+                        .on_response(DefaultOnResponse::new().level(Level::INFO)),
+                )
+                .layer(Extension(shared_state)),
+        );
 
     Server::bind(&"127.0.0.1:8081".parse().unwrap())
         .serve(app.into_make_service())
@@ -57,5 +60,16 @@ async fn main() {
 }
 
 async fn info(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
-    Json(InfoResponse::new(state.client.coins()))
+    let client = &state.client;
+    Json(InfoResponse::new(
+        client.coins(),
+        client.get_all_active_coin_finalization_data(),
+    ))
+}
+
+async fn pending(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
+    let client = &state.client;
+    Json(PendingResponse::new(
+        client.get_all_active_coin_finalization_data(),
+    ))
 }
