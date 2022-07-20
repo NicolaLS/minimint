@@ -23,6 +23,11 @@ pub struct PendingResponse {
     acc_val_amount: Amount,
 }
 
+#[derive(Serialize)]
+pub struct PeginAddressResponse {
+    pegin_address: bitcoin::Address,
+}
+
 impl InfoResponse {
     pub fn new(coins: Coins<SpendableCoin>, cfd: Vec<CoinFinalizationData>) -> Self {
         let info_coins: Vec<CoinsByTier> = coins
@@ -49,5 +54,11 @@ impl PendingResponse {
             acc_qty_coins,
             acc_val_amount,
         }
+    }
+}
+
+impl PeginAddressResponse {
+    pub fn new(pegin_address: bitcoin::Address) -> Self {
+        Self { pegin_address }
     }
 }

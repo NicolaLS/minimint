@@ -2,9 +2,10 @@ use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::{Extension, Json, Router, Server};
 use clap::Parser;
-use clientd::{InfoResponse, PendingResponse};
+use clientd::{InfoResponse, PeginAddressResponse, PendingResponse};
 use minimint_core::config::load_from_file;
 use mint_client::{Client, UserClientConfig};
+use rand::rngs::OsRng;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tower::ServiceBuilder;
@@ -18,6 +19,7 @@ struct Config {
 }
 struct State {
     client: Client<UserClientConfig>,
+    rng: OsRng,
 }
 #[tokio::main]
 async fn main() {
@@ -37,11 +39,13 @@ async fn main() {
         .unwrap();
 
     let client = Client::new(cfg.clone(), Box::new(db), Default::default()).await;
+    let rng = OsRng::new().unwrap();
 
-    let shared_state = Arc::new(State { client });
+    let shared_state = Arc::new(State { client, rng });
     let app = Router::new()
         .route("/getInfo", post(info))
         .route("/getPending", post(pending))
+        .route("/getPegInAdress", post(pegin_address))
         .layer(
             ServiceBuilder::new()
                 .layer(
@@ -71,5 +75,13 @@ async fn pending(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
     let client = &state.client;
     Json(PendingResponse::new(
         client.get_all_active_coin_finalization_data(),
+    ))
+}
+
+async fn pegin_address(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
+    let client = &state.client;
+    let mut rng = state.rng.clone();
+    Json(PeginAddressResponse::new(
+        client.get_new_pegin_address(&mut rng),
     ))
 }
