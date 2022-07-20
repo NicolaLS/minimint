@@ -165,6 +165,8 @@ pub enum ApiError {
     CoreError(#[from] CoreError),
     #[error("Timeout error awaiting outcome")]
     Timeout,
+    #[error("API error: error: {0}")]
+    Custom(String),
 }
 
 impl ApiError {

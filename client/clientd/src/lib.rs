@@ -14,6 +14,12 @@ pub struct PeginPayload {
     pub transaction: Transaction,
 }
 
+#[derive(Deserialize)]
+#[serde(transparent)]
+pub struct LnPayPayload {
+    pub bolt11: lightning_invoice::Invoice,
+}
+
 #[derive(Serialize)]
 pub struct InfoResponse {
     coins: Vec<CoinsByTier>,

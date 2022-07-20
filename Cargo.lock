@@ -745,10 +745,12 @@ dependencies = [
  "bitcoin",
  "bitcoin_hashes",
  "clap",
+ "lightning-invoice",
  "minimint-api",
  "minimint-core",
  "mint-client",
  "rand 0.6.5",
+ "reqwest",
  "serde",
  "sled",
  "tokio",
@@ -1970,6 +1972,7 @@ dependencies = [
  "lightning",
  "num-traits",
  "secp256k1",
+ "serde",
 ]
 
 [[package]]
