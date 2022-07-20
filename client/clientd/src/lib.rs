@@ -8,6 +8,12 @@ use std::collections::VecDeque;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::Mutex;
 
+#[derive(Serialize)]
+pub enum RpcResult {
+    Success(serde_json::Value),
+    Failure(serde_json::Value),
+}
+
 #[derive(Deserialize, Clone, Debug)]
 pub struct PeginPayload {
     pub txout_proof: TxOutProof,

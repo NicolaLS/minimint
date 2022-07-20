@@ -5,15 +5,17 @@ use bitcoin_hashes::hex::ToHex;
 use clap::Parser;
 use clientd::{
     Event, EventLog, EventsResponse, InfoResponse, LnPayPayload, PegInOutResponse,
-    PeginAddressResponse, PeginPayload, PendingResponse, SpendResponse,
+    PeginAddressResponse, PeginPayload, PendingResponse, RpcResult, SpendResponse,
 };
 use minimint_api::Amount;
 use minimint_core::config::load_from_file;
 use minimint_core::modules::mint::tiered::coins::Coins;
 use mint_client::ln::gateway::LightningGateway;
 use mint_client::mint::SpendableCoin;
+use mint_client::utils::serialize_coins;
 use mint_client::{Client, ClientError, UserClientConfig};
 use rand::rngs::OsRng;
+use serde_json::json;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
@@ -102,25 +104,25 @@ async fn main() {
 
 async fn info(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
     let client = &state.client;
-    Json(InfoResponse::new(
+    Json(RpcResult::Success(json!(InfoResponse::new(
         client.coins(),
         client.get_all_active_coin_finalization_data(),
-    ))
+    ))))
 }
 
 async fn pending(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
     let client = &state.client;
-    Json(PendingResponse::new(
-        client.get_all_active_coin_finalization_data(),
-    ))
+    Json(RpcResult::Success(json!(PendingResponse::new(
+        client.get_all_active_coin_finalization_data()
+    ))))
 }
 
 async fn pegin_address(Extension(state): Extension<Arc<State>>) -> impl IntoResponse {
     let client = &state.client;
     let mut rng = state.rng.clone();
-    Json(PeginAddressResponse::new(
+    Json(RpcResult::Success(json!(PeginAddressResponse::new(
         client.get_new_pegin_address(&mut rng),
-    ))
+    ))))
 }
 
 async fn pegin(
@@ -128,15 +130,29 @@ async fn pegin(
     payload: Json<PeginPayload>,
 ) -> impl IntoResponse {
     let client = &state.client;
+    let event_log = &state.event_log;
     let mut rng = state.rng.clone();
     let txout_proof = payload.0.txout_proof;
     let transaction = payload.0.transaction;
-    let txid = client
-        .peg_in(txout_proof, transaction, &mut rng)
-        .await
-        .unwrap(); //TODO: handle unwrap()
-    info!("Started peg-in {}, result will be fetched", txid.to_hex());
-    Json(PegInOutResponse::new(txid))
+    let txid = match client.peg_in(txout_proof, transaction, &mut rng).await {
+        Ok(txid) => {
+            let txid_hex = txid.to_hex();
+            info!("Started peg-in {}, result will be fetched", txid_hex);
+            event_log
+                .add(format!(
+                    "Started peg-in {}, result will be fetched",
+                    txid_hex
+                ))
+                .await;
+            txid
+        }
+        Err(e) => {
+            let err_res = Event::new(format!("{:?}", e));
+            event_log.add_event(err_res.clone()).await;
+            return Json(RpcResult::Failure(json!(err_res)));
+        }
+    };
+    Json(RpcResult::Success(json!(PegInOutResponse::new(txid))))
 }
 
 //TODO: wait for https://github.com/fedimint/minimint/issues/80 and implement solution for this handler
@@ -145,10 +161,29 @@ async fn spend(
     payload: Json<Amount>,
 ) -> impl IntoResponse {
     let client = &state.client;
+    let event_log = &state.event_log;
     let amount = payload.0;
 
-    let spending_coins = client.select_and_spend_coins(amount).unwrap(); //TODO: handle unwrap()
-    Json(SpendResponse::new(spending_coins))
+    let spending_coins = match client.select_and_spend_coins(amount) {
+        Ok(c) => {
+            event_log
+                .add(format!(
+                    "successfully spend coins: msat: {}, ecash: {}",
+                    amount.milli_sat,
+                    serialize_coins(&c)
+                ))
+                .await;
+            c
+        }
+        Err(e) => {
+            let err_res = Event::new(format!("{:?}", e));
+            event_log.add_event(err_res.clone()).await;
+            return Json(RpcResult::Failure(json!(err_res)));
+        }
+    };
+    Json(RpcResult::Success(json!(SpendResponse::new(
+        spending_coins
+    ))))
 }
 
 async fn reissue(Extension(state): Extension<Arc<State>>, payload: Json<Coins<SpendableCoin>>) {
@@ -181,7 +216,9 @@ async fn events(Extension(state): Extension<Arc<State>>, payload: Json<u64>) -> 
     let timestamp = payload.0;
     let event_log = &state.event_log;
     let queried_events = event_log.get(timestamp).await;
-    Json(EventsResponse::new(queried_events))
+    Json(RpcResult::Success(json!(EventsResponse::new(
+        queried_events
+    ))))
 }
 
 //TODO: wait for https://github.com/fedimint/minimint/issues/80 and implement solution for this handler
@@ -190,14 +227,23 @@ async fn lnpay(
     payload: Json<LnPayPayload>,
 ) -> impl IntoResponse {
     let client = Arc::clone(&state.client);
+    let event_log = &state.event_log;
     let gateway = Arc::clone(&state.gateway);
     let rng = state.rng.clone();
     let invoice = payload.0.bolt11;
 
-    match pay_invoice(invoice, client, gateway, rng).await {
-        Ok(_) => Json(Event::new("Success".to_string())),
-        Err(e) => Json(Event::new(format!("Error paying invoice: {:?}", e))),
-    }
+    return match pay_invoice(invoice, client, gateway, rng).await {
+        Ok(_) => {
+            let event = Event::new("Success".to_string());
+            event_log.add_event(event.clone()).await;
+            Json(RpcResult::Success(json!(event)))
+        }
+        Err(e) => {
+            let event = Event::new(format!("Error paying invoice: {:?}", e));
+            event_log.add_event(event.clone()).await;
+            Json(RpcResult::Failure(json!(event)))
+        }
+    };
 }
 
 async fn fetch(client: Arc<Client<UserClientConfig>>, event_log: Arc<EventLog>) {
