@@ -5,7 +5,7 @@ use bitcoin_hashes::hex::ToHex;
 use clap::Parser;
 use clientd::{
     Event, EventLog, EventsResponse, InfoResponse, LnPayPayload, PegInOutResponse,
-    PeginAddressResponse, PeginPayload, PendingResponse, RpcResult, SpendResponse,
+    PeginAddressResponse, PeginPayload, PendingResponse, ReissueResponse, RpcResult, SpendResponse,
 };
 use minimint_api::Amount;
 use minimint_core::config::load_from_file;
@@ -77,6 +77,7 @@ async fn main() {
         .route("/spend", post(spend))
         .route("/lnpay", post(lnpay))
         .route("/reissue", post(reissue))
+        .route("/reissueValidate", post(reissue_validate))
         .layer(
             ServiceBuilder::new()
                 .layer(
@@ -210,6 +211,40 @@ async fn reissue(Extension(state): Extension<Arc<State>>, payload: Json<Coins<Sp
             }
         }
     });
+}
+
+async fn reissue_validate(
+    Extension(state): Extension<Arc<State>>,
+    payload: Json<Coins<SpendableCoin>>,
+) -> impl IntoResponse {
+    let client = &state.client;
+    let event_log = &state.event_log;
+    let coins = payload.0;
+    let fetch_tx = state.fetch_tx.clone();
+    let mut rng = state.rng.clone();
+    let outpoint = match client.reissue(coins, &mut rng).await {
+        Ok(outpoint) => {
+            event_log
+                .add(format!("Successful reissue, outpoint: {:?}", outpoint))
+                .await;
+            if let Err(e) = fetch_tx.send(()).await {
+                event_log
+                    .add(format!("Critical error, restart the deamon: {}", e))
+                    .await;
+            }
+            outpoint
+        }
+        Err(e) => {
+            let event = Event::new(format!("Error while reissue: {:?}", e));
+            event_log.add_event(event.clone()).await;
+            return Json(RpcResult::Failure(json!(event)));
+        }
+    };
+    //unwrap ok since this is polling=true
+    let status = client.fetch_tx_outcome(outpoint.txid, true).await.unwrap();
+    Json(RpcResult::Success(json!(ReissueResponse::new(
+        outpoint, status
+    ))))
 }
 
 async fn events(Extension(state): Extension<Arc<State>>, payload: Json<u64>) -> impl IntoResponse {

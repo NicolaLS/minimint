@@ -1,7 +1,8 @@
 use bitcoin::Transaction;
-use minimint_api::{Amount, TransactionId};
+use minimint_api::{Amount, OutPoint, TransactionId};
 use minimint_core::modules::mint::tiered::coins::Coins;
 use minimint_core::modules::wallet::txoproof::TxOutProof;
+use minimint_core::outcome::TransactionStatus;
 use mint_client::mint::{CoinFinalizationData, SpendableCoin};
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
@@ -66,6 +67,12 @@ pub struct EventsResponse {
     events: Vec<Event>,
 }
 
+#[derive(Serialize)]
+pub struct ReissueResponse {
+    out_point: OutPoint,
+    status: TransactionStatus,
+}
+
 impl InfoResponse {
     pub fn new(coins: Coins<SpendableCoin>, cfd: Vec<CoinFinalizationData>) -> Self {
         let info_coins: Vec<CoinsByTier> = coins
@@ -116,6 +123,12 @@ impl SpendResponse {
 impl EventsResponse {
     pub fn new(events: Vec<Event>) -> Self {
         Self { events }
+    }
+}
+
+impl ReissueResponse {
+    pub fn new(out_point: OutPoint, status: TransactionStatus) -> Self {
+        Self { out_point, status }
     }
 }
 
