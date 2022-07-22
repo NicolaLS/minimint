@@ -1,33 +1,35 @@
+use anyhow::Result;
 use bitcoin::Transaction;
 use minimint_api::{Amount, OutPoint, TransactionId};
 use minimint_core::modules::mint::tiered::coins::Coins;
 use minimint_core::modules::wallet::txoproof::TxOutProof;
 use minimint_core::outcome::TransactionStatus;
 use mint_client::mint::{CoinFinalizationData, SpendableCoin};
+use mint_client::utils::serialize_coins;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::Mutex;
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 pub enum RpcResult {
     Success(serde_json::Value),
     Failure(serde_json::Value),
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct PeginPayload {
     pub txout_proof: TxOutProof,
     pub transaction: Transaction,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct LnPayPayload {
     pub bolt11: lightning_invoice::Invoice,
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct PegoutPayload {
     pub address: bitcoin::Address,
     #[serde(with = "bitcoin::util::amount::serde::as_sat")]
@@ -64,7 +66,7 @@ pub struct PegInOutResponse {
     txid: TransactionId,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct SpendResponse {
     pub coins: Coins<SpendableCoin>,
 }
@@ -124,6 +126,10 @@ impl PegInOutResponse {
 impl SpendResponse {
     pub fn new(coins: Coins<SpendableCoin>) -> Self {
         Self { coins }
+    }
+
+    pub fn serialized(&self) -> String {
+        serialize_coins(&self.coins)
     }
 }
 
@@ -195,4 +201,16 @@ impl EventLog {
             .unwrap_or_else(|i| i);
         events.range(i..).cloned().collect()
     }
+}
+
+pub async fn call<P: Serialize + ?Sized>(params: &P, enpoint: &str) -> Result<RpcResult> {
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post(format!("http://127.0.0.1:8081{}", enpoint))
+        .json(params)
+        .send()
+        .await?;
+
+    Ok(response.json().await?)
 }

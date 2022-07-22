@@ -9,6 +9,7 @@ edition = "2021"
 mint-client = { path = "../client-lib" }
 minimint-api = { path = "../../minimint-api" }
 minimint-core = { path = "../../minimint-core" }
+anyhow = "1.0.58"
 sled = "0.34.6"
 tokio = { version = "1.19.2", features = ["full"] }
 serde = { version = "1.0.118", features = [ "derive" ] }

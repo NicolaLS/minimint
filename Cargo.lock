@@ -741,6 +741,7 @@ dependencies = [
 name = "clientd"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
  "bitcoin",
  "bitcoin_hashes",
