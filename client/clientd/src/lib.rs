@@ -27,6 +27,13 @@ pub struct LnPayPayload {
     pub bolt11: lightning_invoice::Invoice,
 }
 
+#[derive(Deserialize, Clone, Debug)]
+pub struct PegoutPayload {
+    pub address: bitcoin::Address,
+    #[serde(with = "bitcoin::util::amount::serde::as_sat")]
+    pub amount: bitcoin::Amount,
+}
+
 #[derive(Serialize)]
 pub struct InfoResponse {
     coins: Vec<CoinsByTier>,

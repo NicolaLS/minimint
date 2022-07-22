@@ -5,7 +5,8 @@ use bitcoin_hashes::hex::ToHex;
 use clap::Parser;
 use clientd::{
     Event, EventLog, EventsResponse, InfoResponse, LnPayPayload, PegInOutResponse,
-    PeginAddressResponse, PeginPayload, PendingResponse, ReissueResponse, RpcResult, SpendResponse,
+    PeginAddressResponse, PeginPayload, PegoutPayload, PendingResponse, ReissueResponse, RpcResult,
+    SpendResponse,
 };
 use minimint_api::Amount;
 use minimint_core::config::load_from_file;
@@ -74,6 +75,7 @@ async fn main() {
         .route("/getPegInAdress", post(pegin_address))
         .route("/getEvents", post(events))
         .route("/pegin", post(pegin))
+        .route("/pegout", post(pegout))
         .route("/spend", post(spend))
         .route("/lnpay", post(lnpay))
         .route("/reissue", post(reissue))
@@ -245,6 +247,41 @@ async fn reissue_validate(
     Json(RpcResult::Success(json!(ReissueResponse::new(
         outpoint, status
     ))))
+}
+
+async fn pegout(
+    Extension(state): Extension<Arc<State>>,
+    payload: Json<PegoutPayload>,
+) -> impl IntoResponse {
+    let client = &state.client;
+    let event_log = &state.event_log;
+    let rng = state.rng.clone();
+    let address = payload.0.address;
+    let amt = payload.0.amount;
+    let peg_out = match client.new_peg_out_with_fees(amt, address).await {
+        Ok(p) => p,
+        Err(e) => {
+            let err_res = Event::new(format!("{:?}", e));
+            event_log.add_event(err_res.clone()).await;
+            return Json(RpcResult::Failure(json!(err_res)));
+        }
+    };
+    let txid = match client.peg_out(peg_out, rng).await {
+        Ok(txid) => {
+            let txid_hex = txid.to_hex();
+            info!("Pegged out {} with txid: {}", amt, txid_hex);
+            event_log
+                .add(format!("Pegged out {} with txid: {}", amt, txid_hex))
+                .await;
+            txid
+        }
+        Err(e) => {
+            let err_res = Event::new(format!("{:?}", e));
+            event_log.add_event(err_res.clone()).await;
+            return Json(RpcResult::Failure(json!(err_res)));
+        }
+    };
+    Json(RpcResult::Success(json!(PegInOutResponse::new(txid))))
 }
 
 async fn events(Extension(state): Extension<Arc<State>>, payload: Json<u64>) -> impl IntoResponse {
