@@ -94,7 +94,7 @@ async fn main() {
             print_json(call(&timestamp, "/getEvents").await, args.raw_json);
         }
         Commands::NewPeginAddress => {
-            print_json(call("", "/getPeginAdress").await, args.raw_json);
+            print_json(call("", "/getPegInAdress").await, args.raw_json);
         }
         Commands::PegIn {
             txout_proof,
