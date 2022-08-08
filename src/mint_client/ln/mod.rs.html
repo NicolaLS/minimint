@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/ln/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mint_client/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../mint_client/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `client/client-lib/src/ln/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mint_client/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mint_client/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mint_client/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -413,15 +407,18 @@
 <span id="407">407</span>
 <span id="408">408</span>
 <span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
 </pre><pre class="rust"><code><span class="comment">// TODO: once user and mint client are merged, make this private again</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">db</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gateway</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">incoming</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">outgoing</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::ApiError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ln::db</span>::{<span class="ident">OutgoingPaymentKey</span>, <span class="ident">OutgoingPaymentKeyPrefix</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ln::gateway::LightningGateway</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ln::incoming::IncomingContractAccount</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ln::outgoing</span>::{<span class="ident">OutgoingContractAccount</span>, <span class="ident">OutgoingContractData</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::BorrowedClientContext</span>;
@@ -436,7 +433,7 @@
     <span class="ident">Contract</span>, <span class="ident">ContractId</span>, <span class="ident">FundedContract</span>, <span class="ident">IdentifyableContract</span>,
 };
 <span class="kw">use</span> <span class="ident">minimint_core::modules::ln</span>::{
-    <span class="ident">ContractAccount</span>, <span class="ident">ContractInput</span>, <span class="ident">ContractOrOfferOutput</span>, <span class="ident">ContractOutput</span>,
+    <span class="ident">ContractAccount</span>, <span class="ident">ContractInput</span>, <span class="ident">ContractOrOfferOutput</span>, <span class="ident">ContractOutput</span>, <span class="ident">LightningGateway</span>,
 };
 <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">CryptoRng</span>, <span class="ident">RngCore</span>};
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
@@ -453,7 +450,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> <span class="ident">LnClient</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create an output that incentivizes a Lighning gateway to pay an invoice for us. It has time</span>
     <span class="doccomment">/// till the block height defined by `timelock`, after that we can claim our money back.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_outgoing_output</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_outgoing_output</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">batch</span>: <span class="ident">BatchTx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">invoice</span>: <span class="ident">Invoice</span>,
@@ -612,7 +609,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::api::FederationApi</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ln::gateway::LightningGateway</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ln::LnClient</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::OwnedClientContext</span>;
     <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -625,8 +621,8 @@
     <span class="kw">use</span> <span class="ident">minimint_core::modules::ln::config::LightningModuleClientConfig</span>;
     <span class="kw">use</span> <span class="ident">minimint_core::modules::ln::contracts::incoming::IncomingContractOffer</span>;
     <span class="kw">use</span> <span class="ident">minimint_core::modules::ln::contracts</span>::{<span class="ident">ContractId</span>, <span class="ident">IdentifyableContract</span>};
-    <span class="kw">use</span> <span class="ident">minimint_core::modules::ln::ContractOrOfferOutput</span>;
     <span class="kw">use</span> <span class="ident">minimint_core::modules::ln</span>::{<span class="ident">ContractAccount</span>, <span class="ident">LightningModule</span>};
+    <span class="kw">use</span> <span class="ident">minimint_core::modules::ln</span>::{<span class="ident">ContractOrOfferOutput</span>, <span class="ident">LightningGateway</span>};
     <span class="kw">use</span> <span class="ident">minimint_core::modules::wallet::PegOutFees</span>;
     <span class="kw">use</span> <span class="ident">minimint_core::outcome</span>::{<span class="ident">OutputOutcome</span>, <span class="ident">TransactionStatus</span>};
     <span class="kw">use</span> <span class="ident">minimint_core::transaction::Transaction</span>;
@@ -690,6 +686,14 @@
             <span class="ident">_amount</span>: <span class="kw-2">&amp;</span><span class="ident">bitcoin::Amount</span>,
         ) -&gt; <span class="ident"><span class="kw">crate</span>::api::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PegOutFees</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="macro">unimplemented!</span>();
+        }
+
+        <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">fetch_gateways</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::api::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LightningGateway</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+            <span class="macro">unimplemented!</span>()
+        }
+
+        <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_gateway</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_gateway</span>: <span class="ident">LightningGateway</span>) -&gt; <span class="ident"><span class="kw">crate</span>::api::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="macro">unimplemented!</span>()
         }
     }
 
@@ -762,8 +766,8 @@
                 <span class="ident">timelock</span>,
                 <span class="kw-2">&amp;mut</span> <span class="ident">rng</span>,
             )
-            .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
+
         <span class="ident">client_context</span>.<span class="ident">db</span>.<span class="ident">apply_batch</span>(<span class="ident">batch</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">output</span> {
@@ -823,5 +827,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0-nightly (2643b1646 2022-07-27)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (d394408fb 2022-08-07)" ></div></body></html>
