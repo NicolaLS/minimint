@@ -3,81 +3,16 @@
 name: "CI (nix)"
 
 # Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main", "master", "devel" ]
-  pull_request:
-    branches: [ "main", "master", "devel" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: push
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  lint:
-    name: "Lint"
-    runs-on: buildjet-2vcpu-ubuntu-2004
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v15
-        with:
-          nix_path: nixpkgs=channel:nixos-22.05
-      - uses: cachix/cachix-action@v10
-        with:
-          name: fedimint
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-
-      # run the same check that git `pre-commit` hook would, just in case
-      - name: Commit check
-        run: nix develop --ignore-environment --extra-experimental-features nix-command --extra-experimental-features flakes .#lint --command ./misc/git-hooks/pre-commit
-
-  build:
-    name: "Build"
-    runs-on: buildjet-8vcpu-ubuntu-2004
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v15
-        with:
-          nix_path: nixpkgs=channel:nixos-22.05
-      - uses: cachix/cachix-action@v10
-        with:
-          name: fedimint
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-
-      - name: Build workspace
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#workspaceBuild
-
-      - name: Clippy workspace
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#workspaceClippy
-
-      - name: Test workspace
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#workspaceTest
-
-      - name: Latency Tests
-        # run: nix-shell --command ./scripts/latency-test.sh
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#cli-test.latency
-
-      - name: CLI Tests
-        # run: nix-shell --command ./scripts/cli-test.sh
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#cli-test.cli
-
-      - name: Clientd and clientd-cli tests
-        # run: nix-shell --command ./scripts/clientd-tests.sh
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#cli-test.clientd
-
-      - name: Integration Tests
-        # run: nix-shell --command ./scripts/rust-tests.sh
-        run: nix build -L --extra-experimental-features nix-command --extra-experimental-features flakes .#cli-test.rust-tests
-
   # Code Coverage will build using a completely different profile (neither debug/release)
   # Which means we can not reuse much from `build` job. Might as well run it as another
   # build in parallel
   ccov:
     name: "Code coverage"
-    runs-on: buildjet-8vcpu-ubuntu-2004
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
