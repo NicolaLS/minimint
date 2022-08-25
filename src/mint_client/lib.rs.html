@@ -927,6 +927,7 @@
 <span id="927">927</span>
 <span id="928">928</span>
 <span id="929">929</span>
+<span id="930">930</span>
 </pre><pre class="rust"><code><span class="kw">pub mod </span>api;
 <span class="kw">pub mod </span>ln;
 <span class="kw">pub mod </span>mint;
@@ -935,7 +936,8 @@
 <span class="kw">pub mod </span>wallet;
 
 <span class="kw">use </span>std::time::Duration;
-<span class="kw">use </span>std::time::SystemTime;
+<span class="attribute">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
+</span><span class="kw">use </span>std::time::SystemTime;
 
 <span class="kw">use </span>futures::StreamExt;
 
@@ -1857,4 +1859,4 @@
     </span>OutgoingPaymentTimeout,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (060e47f74 2022-08-23)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (addacb587 2022-08-24)" ></div></body></html>
