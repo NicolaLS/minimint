@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-mint/src/tiered/coins.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>coins.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../fedimint_mint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../fedimint_mint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../fedimint_mint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `modules/fedimint-mint/src/tiered/tiered_multi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tiered_multi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../fedimint_mint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../fedimint_mint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../fedimint_mint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -299,7 +299,30 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-</pre><pre class="rust"><code><span class="kw">use crate</span>::{Amount, InvalidAmountTierError, Keys};
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{Amount, InvalidAmountTierError, Tiered};
 <span class="kw">use </span>fedimint_api::encoding::{Decodable, DecodeError, Encodable};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::collections::BTreeMap;
@@ -312,43 +335,45 @@
 /// the total amount represented. As it is prudent to limit both the maximum coin amount and maximum
 /// coin count per transaction this shouldn&#39;t be a problem in practice though.
 </span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>Coins&lt;C&gt; {
-    <span class="kw">pub </span>coins: BTreeMap&lt;Amount, Vec&lt;C&gt;&gt;,
-}
+</span><span class="kw">pub struct </span>TieredMulti&lt;T&gt;(BTreeMap&lt;Amount, Vec&lt;T&gt;&gt;);
 
-<span class="kw">pub struct </span>TieredMultiZip&lt;<span class="lifetime">&#39;a</span>, I, C&gt;
-<span class="kw">where
-    </span>I: <span class="lifetime">&#39;a</span>,
-{
-    iters: Vec&lt;I&gt;,
-    _pd: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>C&gt;,
-}
+<span class="kw">impl</span>&lt;T&gt; TieredMulti&lt;T&gt; {
+    <span class="kw">pub fn </span>new(map: BTreeMap&lt;Amount, Vec&lt;T&gt;&gt;) -&gt; <span class="self">Self </span>{
+        TieredMulti(map)
+    }
 
-<span class="kw">impl</span>&lt;C&gt; Coins&lt;C&gt; {
-    <span class="kw">pub fn </span>amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Amount {
+    <span class="kw">pub fn </span>total_amount(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Amount {
         <span class="kw">let </span>milli_sat = <span class="self">self
-            </span>.coins
-            .iter()
+            </span>.<span class="number">0
+            </span>.iter()
             .map(|(tier, coins)| tier.milli_sat * (coins.len() <span class="kw">as </span>u64))
             .sum();
         Amount { milli_sat }
     }
 
-    <span class="kw">pub fn </span>coin_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.coins.iter().map(|(<span class="kw">_</span>, coins)| coins.len()).sum()
+    <span class="kw">pub fn </span>item_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.iter().map(|(<span class="kw">_</span>, coins)| coins.len()).sum()
     }
 
-    <span class="kw">pub fn </span>coin_amount_tiers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>Amount&gt; {
-        <span class="self">self</span>.coins.keys()
+    <span class="kw">pub fn </span>tier_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.len()
     }
 
-    <span class="kw">pub fn </span>map&lt;F, N, E&gt;(<span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;Coins&lt;N&gt;, E&gt;
+    <span class="kw">pub fn </span>tiers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>Amount&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.keys()
+    }
+
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.item_count() == <span class="number">0
+    </span>}
+
+    <span class="kw">pub fn </span>map&lt;F, N, E&gt;(<span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;TieredMulti&lt;N&gt;, E&gt;
     <span class="kw">where
-        </span>F: Fn(Amount, C) -&gt; <span class="prelude-ty">Result</span>&lt;N, E&gt;,
+        </span>F: Fn(Amount, T) -&gt; <span class="prelude-ty">Result</span>&lt;N, E&gt;,
     {
-        <span class="kw">let </span>coins = <span class="self">self
-            </span>.coins
-            .into_iter()
+        <span class="kw">let </span>res = <span class="self">self
+            </span>.<span class="number">0
+            </span>.into_iter()
             .map(|(amt, coins)| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, E&gt; {
                 <span class="kw">let </span>coins = coins
                     .into_iter()
@@ -358,35 +383,48 @@
             })
             .collect::&lt;<span class="prelude-ty">Result</span>&lt;BTreeMap&lt;Amount, Vec&lt;N&gt;&gt;, E&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(Coins { coins })
+        <span class="prelude-val">Ok</span>(TieredMulti(res))
     }
 
-    <span class="kw">pub fn </span>structural_eq&lt;O&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Coins&lt;O&gt;) -&gt; bool {
-        <span class="kw">let </span>tier_eq = <span class="self">self</span>.coins.keys().eq(other.coins.keys());
-        <span class="kw">let </span>coins_per_tier_eq = <span class="self">self
-            </span>.coins
-            .values()
-            .zip(other.coins.values())
+    <span class="kw">pub fn </span>structural_eq&lt;O&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>TieredMulti&lt;O&gt;) -&gt; bool {
+        <span class="kw">let </span>tier_eq = <span class="self">self</span>.<span class="number">0</span>.keys().eq(other.<span class="number">0</span>.keys());
+        <span class="kw">let </span>per_tier_eq = <span class="self">self
+            </span>.<span class="number">0
+            </span>.values()
+            .zip(other.<span class="number">0</span>.values())
             .all(|(c1, c2)| c1.len() == c2.len());
 
-        tier_eq &amp;&amp; coins_per_tier_eq
+        tier_eq &amp;&amp; per_tier_eq
     }
 
-    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (Amount, <span class="kw-2">&amp;</span>C)&gt; + DoubleEndedIterator {
-        <span class="self">self</span>.coins
-            .iter()
+    <span class="kw">pub fn </span>iter_tiers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (<span class="kw-2">&amp;</span>Amount, <span class="kw-2">&amp;</span>Vec&lt;T&gt;)&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.iter()
+    }
+
+    <span class="kw">pub fn </span>iter_items(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (Amount, <span class="kw-2">&amp;</span>T)&gt; + DoubleEndedIterator {
+        <span class="self">self</span>.<span class="number">0
+            </span>.iter()
             .flat_map(|(amt, coins)| coins.iter().map(<span class="kw">move </span>|c| (<span class="kw-2">*</span>amt, c)))
     }
 
-    <span class="kw">pub fn </span>check_tiers&lt;K&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, keys: <span class="kw-2">&amp;</span>Keys&lt;K&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidAmountTierError&gt; {
-        <span class="kw">match </span><span class="self">self</span>.coins.keys().find(|amt| !keys.keys.contains_key(amt)) {
+    <span class="kw">pub fn </span>check_tiers&lt;K&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, keys: <span class="kw-2">&amp;</span>Tiered&lt;K&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidAmountTierError&gt; {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.keys().find(|amt| !keys.<span class="number">0</span>.contains_key(amt)) {
             <span class="prelude-val">Some</span>(amt) =&gt; <span class="prelude-val">Err</span>(InvalidAmountTierError(<span class="kw-2">*</span>amt)),
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
+
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, amt: Amount) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Vec&lt;T&gt;&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.get(<span class="kw-2">&amp;</span>amt)
+    }
+
+    <span class="comment">// TODO: Get rid of it. It might be used to break useful invariants (like making sure there are no empty `Vec`s after removal)
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, amt: Amount) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Vec&lt;T&gt;&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.get_mut(<span class="kw-2">&amp;</span>amt)
+    }
 }
 
-<span class="kw">impl</span>&lt;C&gt; Coins&lt;C&gt;
+<span class="kw">impl</span>&lt;C&gt; TieredMulti&lt;C&gt;
 <span class="kw">where
     </span>C: Clone,
 {
@@ -395,15 +433,16 @@
     /// returned.
     ///
     /// The caller can request change from the federation.
-    </span><span class="kw">pub fn </span>select_coins(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: Amount) -&gt; <span class="prelude-ty">Option</span>&lt;Coins&lt;C&gt;&gt; {
-        <span class="kw">if </span>amount &gt; <span class="self">self</span>.amount() {
+    </span><span class="comment">// TODO: move somewhere else?
+    </span><span class="kw">pub fn </span>select_coins(<span class="kw-2">&amp;</span><span class="self">self</span>, amount: Amount) -&gt; <span class="prelude-ty">Option</span>&lt;TieredMulti&lt;C&gt;&gt; {
+        <span class="kw">if </span>amount &gt; <span class="self">self</span>.total_amount() {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>remaining = <span class="self">self</span>.amount();
+        <span class="kw">let </span><span class="kw-2">mut </span>remaining = <span class="self">self</span>.total_amount();
 
         <span class="kw">let </span>coins = <span class="self">self
-            </span>.iter()
+            </span>.iter_items()
             .rev()
             .filter_map(|(coin_amount, coin)| {
                 <span class="kw">if </span>amount &lt;= remaining - coin_amount {
@@ -413,17 +452,18 @@
                     <span class="prelude-val">Some</span>((coin_amount, (<span class="kw-2">*</span>coin).clone()))
                 }
             })
-            .collect::&lt;Coins&lt;C&gt;&gt;();
+            .collect::&lt;TieredMulti&lt;C&gt;&gt;();
 
         <span class="prelude-val">Some</span>(coins)
     }
 }
 
-<span class="kw">impl </span>Coins&lt;()&gt; {
-    <span class="kw">pub fn </span>represent_amount&lt;K&gt;(<span class="kw-2">mut </span>amount: Amount, tiers: <span class="kw-2">&amp;</span>Keys&lt;K&gt;) -&gt; Coins&lt;()&gt; {
+<span class="kw">impl </span>TieredMulti&lt;()&gt; {
+    <span class="comment">// TODO: move somewhere else?
+    </span><span class="kw">pub fn </span>represent_amount&lt;K&gt;(<span class="kw-2">mut </span>amount: Amount, tiers: <span class="kw-2">&amp;</span>Tiered&lt;K&gt;) -&gt; TieredMulti&lt;()&gt; {
         <span class="kw">let </span>coins = tiers
-            .keys
-            .keys()
+            .<span class="number">0
+            </span>.keys()
             .rev()
             .map(|<span class="kw-2">&amp;</span>amount_tier| {
                 <span class="kw">let </span>res = amount / amount_tier;
@@ -432,19 +472,19 @@
             })
             .collect();
 
-        Coins { coins }
+        TieredMulti(coins)
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; FromIterator&lt;(Amount, C)&gt; <span class="kw">for </span>Coins&lt;C&gt; {
+<span class="kw">impl</span>&lt;C&gt; FromIterator&lt;(Amount, C)&gt; <span class="kw">for </span>TieredMulti&lt;C&gt; {
     <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = (Amount, C)&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>coins = Coins::default();
-        coins.extend(iter);
-        coins
+        <span class="kw">let </span><span class="kw-2">mut </span>res = TieredMulti::default();
+        res.extend(iter);
+        res
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; IntoIterator <span class="kw">for </span>Coins&lt;C&gt;
+<span class="kw">impl</span>&lt;C&gt; IntoIterator <span class="kw">for </span>TieredMulti&lt;C&gt;
 <span class="kw">where
     </span>C: <span class="lifetime">&#39;static</span>,
 {
@@ -453,58 +493,64 @@
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
         Box::new(
-            <span class="self">self</span>.coins
-                .into_iter()
+            <span class="self">self</span>.<span class="number">0
+                </span>.into_iter()
                 .flat_map(|(amt, coins)| coins.into_iter().map(<span class="kw">move </span>|c| (amt, c))),
         )
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; Default <span class="kw">for </span>Coins&lt;C&gt; {
+<span class="kw">impl</span>&lt;C&gt; Default <span class="kw">for </span>TieredMulti&lt;C&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        Coins {
-            coins: BTreeMap::default(),
-        }
+        TieredMulti(BTreeMap::default())
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; Extend&lt;(Amount, C)&gt; <span class="kw">for </span>Coins&lt;C&gt; {
+<span class="kw">impl</span>&lt;C&gt; Extend&lt;(Amount, C)&gt; <span class="kw">for </span>TieredMulti&lt;C&gt; {
     <span class="kw">fn </span>extend&lt;T: IntoIterator&lt;Item = (Amount, C)&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: T) {
         <span class="kw">for </span>(amount, coin) <span class="kw">in </span>iter {
-            <span class="self">self</span>.coins.entry(amount).or_default().push(coin)
+            <span class="self">self</span>.<span class="number">0</span>.entry(amount).or_default().push(coin)
         }
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; Encodable <span class="kw">for </span>Coins&lt;C&gt;
+<span class="kw">impl</span>&lt;C&gt; Encodable <span class="kw">for </span>TieredMulti&lt;C&gt;
 <span class="kw">where
     </span>C: Encodable,
 {
     <span class="kw">fn </span>consensus_encode&lt;W: std::io::Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>writer: W) -&gt; <span class="prelude-ty">Result</span>&lt;usize, std::io::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>len = <span class="number">0</span>;
-        len += (<span class="self">self</span>.iter().count() <span class="kw">as </span>u64).consensus_encode(<span class="kw-2">&amp;mut </span>writer)<span class="question-mark">?</span>;
-        <span class="kw">for </span>(amount, coin) <span class="kw">in </span><span class="self">self</span>.iter() {
+        len += (<span class="self">self</span>.iter_items().count() <span class="kw">as </span>u64).consensus_encode(<span class="kw-2">&amp;mut </span>writer)<span class="question-mark">?</span>;
+        <span class="kw">for </span>(amount, i) <span class="kw">in </span><span class="self">self</span>.iter_items() {
             len += amount.consensus_encode(<span class="kw-2">&amp;mut </span>writer)<span class="question-mark">?</span>;
-            len += coin.consensus_encode(<span class="kw-2">&amp;mut </span>writer)<span class="question-mark">?</span>;
+            len += i.consensus_encode(<span class="kw-2">&amp;mut </span>writer)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(len)
     }
 }
 
-<span class="kw">impl</span>&lt;C&gt; Decodable <span class="kw">for </span>Coins&lt;C&gt;
+<span class="kw">impl</span>&lt;C&gt; Decodable <span class="kw">for </span>TieredMulti&lt;C&gt;
 <span class="kw">where
     </span>C: Decodable,
 {
     <span class="kw">fn </span>consensus_decode&lt;D: std::io::Read&gt;(<span class="kw-2">mut </span>d: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DecodeError&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>coins = BTreeMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>res = BTreeMap::new();
         <span class="kw">let </span>len = u64::consensus_decode(<span class="kw-2">&amp;mut </span>d)<span class="question-mark">?</span>;
         <span class="kw">for _ in </span><span class="number">0</span>..len {
             <span class="kw">let </span>amt = Amount::consensus_decode(<span class="kw-2">&amp;mut </span>d)<span class="question-mark">?</span>;
-            <span class="kw">let </span>coin = C::consensus_decode(<span class="kw-2">&amp;mut </span>d)<span class="question-mark">?</span>;
-            coins.entry(amt).or_insert_with(Vec::new).push(coin);
+            <span class="kw">let </span>v = C::consensus_decode(<span class="kw-2">&amp;mut </span>d)<span class="question-mark">?</span>;
+            res.entry(amt).or_insert_with(Vec::new).push(v);
         }
-        <span class="prelude-val">Ok</span>(Coins { coins })
+        <span class="prelude-val">Ok</span>(TieredMulti(res))
     }
+}
+
+<span class="kw">pub struct </span>TieredMultiZip&lt;<span class="lifetime">&#39;a</span>, I, T&gt;
+<span class="kw">where
+    </span>I: <span class="lifetime">&#39;a</span>,
+{
+    iters: Vec&lt;I&gt;,
+    _pd: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I, C&gt; TieredMultiZip&lt;<span class="lifetime">&#39;a</span>, I, C&gt; {
@@ -556,7 +602,7 @@
 
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span><span class="kw">crate</span>::Coins;
+    <span class="kw">use </span><span class="kw">crate</span>::TieredMulti;
     <span class="kw">use </span>fedimint_api::Amount;
 
     <span class="attribute">#[test]
@@ -593,7 +639,7 @@
         <span class="macro">assert_eq!</span>(starting.select_coins(Amount::from_sat(<span class="number">100</span>)), <span class="prelude-val">None</span>);
     }
 
-    <span class="kw">fn </span>coins(coins: Vec&lt;(Amount, usize)&gt;) -&gt; Coins&lt;usize&gt; {
+    <span class="kw">fn </span>coins(coins: Vec&lt;(Amount, usize)&gt;) -&gt; TieredMulti&lt;usize&gt; {
         coins
             .into_iter()
             .flat_map(|(amount, number)| <span class="macro">vec!</span>[(amount, <span class="number">0_usize</span>); number])
@@ -601,4 +647,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint_mint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (289279de1 2022-09-04)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="fedimint_mint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (17cbdfd07 2022-09-13)" ></div></body></html>
