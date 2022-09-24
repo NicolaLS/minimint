@@ -144,7 +144,7 @@ impl Fixtures {
     }
 
     // Builds (fed, user, bitcoin)
-    pub async fn make(&self) -> (FederationTest, UserTest, Box<dyn BitcoinTest>) {
+    pub fn make(&self) -> (FederationTest, UserTest, Box<dyn BitcoinTest>) {
         let bitcoin: Box<dyn BitcoinTest>;
         let bitcoin_rpc: Box<dyn Fn() -> Box<dyn BitcoindRpc>>;
         let fed;
@@ -164,13 +164,12 @@ impl Fixtures {
                 Arc::new(rocks(dir.clone().into_os_string().into_string().unwrap()))
                     as Arc<dyn Database>
             });
-            fed = FederationTest::new(
+            fed = block_on(FederationTest::new(
                 self.server_config.clone(),
                 &fed_db,
                 &bitcoin_rpc,
                 &connect_gen,
-            )
-            .await;
+            ));
             // prepare user setup real
             user_db = Box::new(rocks(dir.clone().into_os_string().into_string().unwrap()));
         } else {
@@ -185,13 +184,12 @@ impl Fixtures {
             let net_ref = &net;
             let connect_gen = move |cfg: &ServerConfig| net_ref.connector(cfg.identity).into_dyn();
             let fed_db = Box::new(|| Arc::new(MemDatabase::new()) as Arc<dyn Database>);
-            fed = FederationTest::new(
+            fed = block_on(FederationTest::new(
                 self.server_config.clone(),
                 &fed_db,
                 &bitcoin_rpc,
                 &connect_gen,
-            )
-            .await;
+            ));
 
             // prepare user setup fake
             user_db = Box::new(MemDatabase::new());
@@ -200,13 +198,13 @@ impl Fixtures {
         // final setup user
         let user_cfg = UserClientConfig(self.client_config.clone());
         let user = UserTest::new(user_cfg.clone(), self.peers.clone(), user_db);
-        user.client.await_consensus_block_height(0).await;
+        block_on(user.client.await_consensus_block_height(0));
 
         (fed, user, bitcoin)
     }
 
     // Builds all (fed, user, bitcoin, lightning, gateway)
-    pub async fn make_all(
+    pub fn make_all(
         &self,
     ) -> (
         FederationTest,
@@ -218,7 +216,7 @@ impl Fixtures {
     ) {
         let lightning: Box<dyn LightningTest>;
         let lightning_rpc: Box<dyn LnRpc>;
-        let (fed, user, bitcoin) = self.make().await;
+        let (fed, user, bitcoin) = self.make();
 
         if let Some(dir) = &self.real_dir {
             // setup real lighting
@@ -227,12 +225,10 @@ impl Fixtures {
 
             let mut socket_other = dir.clone();
             socket_other.push("ln2/regtest/lightning-rpc");
-            let lightning_prep = RealLightningTest::new(socket_gateway.clone(), socket_other).await;
-            let lightning_rpc_prep = Mutex::new(
-                ClnRpc::new(socket_gateway)
-                    .await
-                    .expect("connect to ln_socket"),
-            );
+            let lightning_prep =
+                block_on(RealLightningTest::new(socket_gateway.clone(), socket_other));
+            let lightning_rpc_prep =
+                Mutex::new(block_on(ClnRpc::new(socket_gateway)).expect("connect to ln_socket"));
 
             lightning = Box::new(lightning_prep);
             lightning_rpc = Box::new(lightning_rpc_prep);
@@ -248,13 +244,12 @@ impl Fixtures {
         // setup gateway
         let ln_rpc_adapter = Arc::new(LnRpcAdapter::new(lightning_rpc));
         let ln_client = Arc::clone(&ln_rpc_adapter) as Arc<dyn LnRpc>;
-        let gateway = GatewayTest::new(
+        let gateway = block_on(GatewayTest::new(
             ln_client,
             self.client_config.clone(),
             lightning.pub_key(),
             self.base_port + self.num_peers + 1,
-        )
-        .await;
+        ));
 
         let adapter = Arc::clone(&ln_rpc_adapter);
 
