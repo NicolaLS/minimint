@@ -665,10 +665,40 @@
 <span id="665">665</span>
 <span id="666">666</span>
 <span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
 </pre><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>bitcoin_hashes::sha256::Hash <span class="kw">as </span>Sha256Hash;
 <span class="kw">use </span>fedimint_api::task::{RwLock, RwLockWriteGuard};
-<span class="kw">use </span>fedimint_api::{OutPoint, PeerId, TransactionId};
+<span class="kw">use </span>fedimint_api::{NumPeers, OutPoint, PeerId, TransactionId};
 <span class="kw">use </span>fedimint_core::modules::ln::contracts::incoming::IncomingContractOffer;
 <span class="kw">use </span>fedimint_core::modules::ln::contracts::ContractId;
 <span class="kw">use </span>fedimint_core::modules::ln::{ContractAccount, LightningGateway};
@@ -683,6 +713,8 @@
 <span class="kw">use </span>tracing::{error, info, instrument};
 <span class="kw">use </span>url::Url;
 
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;android&quot;</span>)]
+</span><span class="kw">use </span>jsonrpsee_core::client::CertificateStore;
 <span class="attribute">#[cfg(not(target_family = <span class="string">&quot;wasm&quot;</span>))]
 </span><span class="kw">use </span>jsonrpsee_ws_client::{WsClient, WsClientBuilder};
 
@@ -792,7 +824,6 @@
 </span><span class="attribute">#[derive(Debug)]
 </span><span class="kw">pub struct </span>WsFederationApi&lt;C = WsClient&gt; {
     members: Vec&lt;FederationMember&lt;C&gt;&gt;,
-    max_evil: usize,
 }
 
 <span class="attribute">#[derive(Debug)]
@@ -806,12 +837,10 @@
 </span><span class="attribute">#[derive(Debug, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>WsFederationConnect {
     <span class="kw">pub </span>members: Vec&lt;(PeerId, Url)&gt;,
-    <span class="kw">pub </span>max_evil: usize,
 }
 
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ClientConfig&gt; <span class="kw">for </span>WsFederationConnect {
     <span class="kw">fn </span>from(config: <span class="kw-2">&amp;</span>ClientConfig) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>max_evil = config.max_evil;
         <span class="kw">let </span>members: Vec&lt;(PeerId, Url)&gt; = config
             .nodes
             .iter()
@@ -822,7 +851,7 @@
                 (peer_id, url)
             })
             .collect();
-        WsFederationConnect { members, max_evil }
+        WsFederationConnect { members }
     }
 }
 
@@ -862,36 +891,48 @@
 </span><span class="kw">impl</span>&lt;C: JsonRpcClient + Send + Sync&gt; FederationApi <span class="kw">for </span>WsFederationApi&lt;C&gt; {
     <span class="doccomment">/// Fetch the outcome of an entire transaction
     </span><span class="kw">async fn </span>fetch_tx_outcome(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: TransactionId) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionStatus&gt; {
-        <span class="self">self</span>.request(<span class="string">&quot;/fetch_transaction&quot;</span>, tx, Retry404::new(<span class="self">self</span>.max_evil))
-            .<span class="kw">await
+        <span class="self">self</span>.request(
+            <span class="string">&quot;/fetch_transaction&quot;</span>,
+            tx,
+            Retry404::new(<span class="self">self</span>.peers().one_honest()),
+        )
+        .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Submit a transaction to all federation members
     </span><span class="kw">async fn </span>submit_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: Transaction) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionId&gt; {
         <span class="comment">// TODO: check the id is correct
-        </span><span class="self">self</span>.request(<span class="string">&quot;/transaction&quot;</span>, tx, CurrentConsensus::new(<span class="self">self</span>.max_evil))
-            .<span class="kw">await
+        </span><span class="self">self</span>.request(
+            <span class="string">&quot;/transaction&quot;</span>,
+            tx,
+            CurrentConsensus::new(<span class="self">self</span>.peers().one_honest()),
+        )
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>fetch_epoch_history(<span class="kw-2">&amp;</span><span class="self">self</span>, epoch: u64, epoch_pk: PublicKey) -&gt; <span class="prelude-ty">Result</span>&lt;EpochHistory&gt; {
         <span class="self">self</span>.request(
             <span class="string">&quot;/fetch_epoch_history&quot;</span>,
             epoch,
-            ValidHistory::new(epoch_pk, <span class="self">self</span>.max_evil),
+            ValidHistory::new(epoch_pk, <span class="self">self</span>.peers().one_honest()),
         )
         .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>fetch_contract(<span class="kw-2">&amp;</span><span class="self">self</span>, contract: ContractId) -&gt; <span class="prelude-ty">Result</span>&lt;ContractAccount&gt; {
-        <span class="self">self</span>.request(<span class="string">&quot;/ln/account&quot;</span>, contract, Retry404::new(<span class="self">self</span>.max_evil))
-            .<span class="kw">await
+        <span class="self">self</span>.request(
+            <span class="string">&quot;/ln/account&quot;</span>,
+            contract,
+            Retry404::new(<span class="self">self</span>.peers().one_honest()),
+        )
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>fetch_consensus_block_height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
         <span class="self">self</span>.request(
             <span class="string">&quot;/wallet/block_height&quot;</span>,
             (),
-            EventuallyConsistent::new(<span class="self">self</span>.max_evil),
+            EventuallyConsistent::new(<span class="self">self</span>.peers().one_honest()),
         )
         .<span class="kw">await
     </span>}
@@ -904,26 +945,34 @@
         <span class="self">self</span>.request(
             <span class="string">&quot;/wallet/peg_out_fees&quot;</span>,
             (address, amount.as_sat()),
-            EventuallyConsistent::new(<span class="self">self</span>.max_evil),
+            EventuallyConsistent::new(<span class="self">self</span>.peers().one_honest()),
         )
         .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>fetch_offer(<span class="kw-2">&amp;</span><span class="self">self</span>, payment_hash: Sha256Hash) -&gt; <span class="prelude-ty">Result</span>&lt;IncomingContractOffer&gt; {
-        <span class="self">self</span>.request(<span class="string">&quot;/ln/offer&quot;</span>, payment_hash, Retry404::new(<span class="self">self</span>.max_evil))
-            .<span class="kw">await
+        <span class="self">self</span>.request(
+            <span class="string">&quot;/ln/offer&quot;</span>,
+            payment_hash,
+            Retry404::new(<span class="self">self</span>.peers().one_honest()),
+        )
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>fetch_gateways(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;LightningGateway&gt;&gt; {
-        <span class="self">self</span>.request(<span class="string">&quot;/ln/list_gateways&quot;</span>, (), UnionResponses::new(<span class="self">self</span>.max_evil))
-            .<span class="kw">await
+        <span class="self">self</span>.request(
+            <span class="string">&quot;/ln/list_gateways&quot;</span>,
+            (),
+            UnionResponses::new(<span class="self">self</span>.peers().one_honest()),
+        )
+        .<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>register_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>, gateway: LightningGateway) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.request(
             <span class="string">&quot;/ln/register_gateway&quot;</span>,
             gateway,
-            CurrentConsensus::new(<span class="self">self</span>.max_evil * <span class="number">2</span>),
+            CurrentConsensus::new(<span class="self">self</span>.peers().threshold()),
         )
         .<span class="kw">await
     </span>}
@@ -933,7 +982,7 @@
             </span>.request(
                 <span class="string">&quot;/ln/offer&quot;</span>,
                 payment_hash,
-                CurrentConsensus::new(<span class="self">self</span>.max_evil),
+                CurrentConsensus::new(<span class="self">self</span>.peers().one_honest()),
             )
             .<span class="kw">await</span>;
 
@@ -954,7 +1003,15 @@
 <span class="attribute">#[async_trait]
 </span><span class="kw">impl </span>JsonRpcClient <span class="kw">for </span>WsClient {
     <span class="kw">async fn </span>connect(url: <span class="kw-2">&amp;</span>Url) -&gt; std::result::Result&lt;<span class="self">Self</span>, JsonRpcError&gt; {
-        WsClientBuilder::default()
+        <span class="comment">// rustls-native-certs doesn&#39;t support android
+        </span><span class="attribute">#[cfg(target_os = <span class="string">&quot;android&quot;</span>)]
+        </span><span class="kw">return </span>WsClientBuilder::default()
+            .certificate_store(CertificateStore::WebPki)
+            .build(url_to_string_with_default_port(url)) <span class="comment">// Hack for default ports, see fn docs
+            </span>.<span class="kw">await</span>;
+
+        <span class="attribute">#[cfg(not(target_os = <span class="string">&quot;android&quot;</span>))]
+        </span>WsClientBuilder::default()
             .build(url_to_string_with_default_port(url)) <span class="comment">// Hack for default ports, see fn docs
             </span>.<span class="kw">await
     </span>}
@@ -966,14 +1023,18 @@
 
 <span class="kw">impl </span>WsFederationApi&lt;WsClient&gt; {
     <span class="doccomment">/// Creates a new API client
-    </span><span class="kw">pub fn </span>new(max_evil: usize, members: Vec&lt;(PeerId, Url)&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new_with_client(max_evil, members)
+    </span><span class="kw">pub fn </span>new(members: Vec&lt;(PeerId, Url)&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new_with_client(members)
     }
 }
 
 <span class="kw">impl</span>&lt;C&gt; WsFederationApi&lt;C&gt; {
+    <span class="kw">pub fn </span>peers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;PeerId&gt; {
+        <span class="self">self</span>.members.iter().map(|member| member.peer_id).collect()
+    }
+
     <span class="doccomment">/// Creates a new API client
-    </span><span class="kw">pub fn </span>new_with_client(max_evil: usize, members: Vec&lt;(PeerId, Url)&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_with_client(members: Vec&lt;(PeerId, Url)&gt;) -&gt; <span class="self">Self </span>{
         WsFederationApi {
             members: members
                 .into_iter()
@@ -991,7 +1052,6 @@
                     }
                 })
                 .collect(),
-            max_evil,
         }
     }
 }
@@ -1333,4 +1393,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (3f83906b3 2022-09-24)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (f5193a9fc 2022-09-25)" ></div></body></html>
