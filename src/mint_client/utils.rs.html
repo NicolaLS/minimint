@@ -63,7 +63,6 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span><span class="kw">crate</span>::api::FederationApi;
@@ -71,13 +70,12 @@
 <span class="kw">use </span>bitcoin::{secp256k1, Network};
 <span class="kw">use </span>fedimint_api::db::Database;
 <span class="kw">use </span>fedimint_api::encoding::Decodable;
-<span class="kw">use </span>fedimint_api::ParseAmountError;
-<span class="kw">use </span>fedimint_core::modules::mint::tiered::TieredMulti;
+<span class="kw">use </span>fedimint_api::{ParseAmountError, TieredMulti};
 <span class="kw">use </span>lightning_invoice::Currency;
 
-<span class="kw">pub fn </span>parse_coins(s: <span class="kw-2">&amp;</span>str) -&gt; TieredMulti&lt;SpendableNote&gt; {
-    <span class="kw">let </span>bytes = base64::decode(s).unwrap();
-    bincode::deserialize(<span class="kw-2">&amp;</span>bytes).unwrap()
+<span class="kw">pub fn </span>parse_coins(s: <span class="kw-2">&amp;</span>str) -&gt; anyhow::Result&lt;TieredMulti&lt;SpendableNote&gt;&gt; {
+    <span class="kw">let </span>bytes = base64::decode(s)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(bincode::deserialize(<span class="kw-2">&amp;</span>bytes)<span class="question-mark">?</span>)
 }
 
 <span class="kw">pub fn </span>serialize_coins(c: <span class="kw-2">&amp;</span>TieredMulti&lt;SpendableNote&gt;) -&gt; String {
@@ -118,7 +116,7 @@
 
 <span class="kw">pub struct </span>ClientContext {
     <span class="kw">pub </span>db: Database,
-    <span class="kw">pub </span>api: Box&lt;<span class="kw">dyn </span>FederationApi&gt;,
+    <span class="kw">pub </span>api: FederationApi,
     <span class="kw">pub </span>secp: secp256k1_zkp::Secp256k1&lt;secp256k1_zkp::All&gt;,
 }
 
@@ -131,4 +129,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (470e518c4 2022-09-27)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mint_client" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>

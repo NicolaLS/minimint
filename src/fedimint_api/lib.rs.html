@@ -295,6 +295,11 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="kw">extern crate </span><span class="self">self </span><span class="kw">as </span>fedimint_api;
 
 <span class="kw">use </span>bitcoin::Denomination;
@@ -311,6 +316,9 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::encoding::{Decodable, DecodeError, Encodable};
 
+<span class="kw">pub use </span>tiered::Tiered;
+<span class="kw">pub use </span>tiered_multi::<span class="kw-2">*</span>;
+
 <span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>db;
 <span class="kw">pub mod </span>encoding;
@@ -318,6 +326,8 @@
 <span class="kw">pub mod </span>module;
 <span class="kw">pub mod </span>rand;
 <span class="kw">pub mod </span>task;
+<span class="kw">pub mod </span>tiered;
+<span class="kw">pub mod </span>tiered_multi;
 
 <span class="macro">hash_newtype!</span>(
     TransactionId,
@@ -593,4 +603,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (470e518c4 2022-09-27)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fedimint_api" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (57f097ea2 2022-10-01)" ></div></body></html>
