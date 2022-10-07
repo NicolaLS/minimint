@@ -14,20 +14,20 @@ path = "src/lib.rs"
 [dependencies]
 anyhow = "1.0.65"
 async-trait = "0.1"
-bitcoin = { version = "0.28.1", features = [ "rand", "serde" ] }
-bitcoin_hashes = { version = "0.10", features = ["serde"] }
-futures = "0.3.21"
+bitcoin = { version = "0.29.1", features = [ "rand", "serde" ] }
+bitcoin_hashes = { version = "0.11", features = ["serde"] }
+futures = "0.3.24"
 hex = "0.4.3"
-lightning-invoice = "0.18.0"
+lightning-invoice = "0.19.0"
 fedimint-derive = { path = "../fedimint-derive" }
-rand = "0.6.0"
-rand07 = { version = "0.7", package = "rand" }
-secp256k1-zkp = { version = "0.6.0", features = [ "use-serde", "bitcoin_hashes", "global-context" ] }
+hbbft = { git = "https://github.com/jkitman/hbbft", branch = "upgrade-threshold-crypto-libs" }
+rand = "0.8.5"
+secp256k1-zkp = { version = "0.7.0", features = [ "use-serde", "bitcoin_hashes", "global-context" ] }
 serde = { version = "1.0.145", features = [ "derive" ] }
 serde_json = "1.0.85"
 tbs = { path = "../crypto/tbs"}
-thiserror = "1.0.23"
-tracing ="0.1.22"
+thiserror = "1.0.37"
+tracing ="0.1.37"
 url = { version = "2.3.1", features = ["serde"] }
 
 [target.'cfg(target_family="wasm")'.dependencies]
@@ -40,7 +40,7 @@ gloo-timers = { version = "0.2.4", features = ["futures"] }
 wasm-bindgen-futures = "0.4.33"
 
 [target.'cfg(not(target_family="wasm"))'.dependencies]
-tokio = { version = "1.21.1", features = ["rt", "rt-multi-thread", "sync", "time"] }
+tokio = { version = "1.21.2", features = ["rt", "rt-multi-thread", "sync", "time"] }
 
 [dev-dependencies]
 test-log = { version = "0.2", features = [ "trace" ], default-features = false }

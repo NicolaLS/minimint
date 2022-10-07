@@ -19,23 +19,23 @@ path = "src/bin/ln_gateway.rs"
 [dependencies]
 async-trait = "0.1.52"
 axum = "0.5.16"
-bitcoin_hashes = "0.10.0"
-bitcoin = { version = "0.28.1", features = ["serde", "use-serde"] }
+bitcoin_hashes = "0.11.0"
+bitcoin = { version = "0.29.1", features = ["serde"] }
 cln-rpc = "0.1"
 cln-plugin = "0.1"
-futures = "0.3.21"
+futures = "0.3.24"
 hex = "0.4.3"
-lightning-invoice = "0.18.0"
+lightning-invoice = "0.19.0"
 fedimint-server = { path = "../fedimint-server/" }
 fedimint-api = { path = "../fedimint-api" }
 fedimint-rocksdb = { path = "../fedimint-rocksdb" }
 mint-client = { path = "../client/client-lib" }
-rand = "0.6"
-secp256k1 = "0.22.1"
+rand = "0.8"
+secp256k1 = "0.24.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.85"
-thiserror = "1.0.30"
-tracing = { version = "0.1.26", default-features = false, features= ["log", "attributes", "std"] }
+thiserror = "1.0.37"
+tracing = { version = "0.1.37", default-features = false, features= ["log", "attributes", "std"] }
 tokio = {version = "1.21", features = ["full"]}
 tower-http = { version = "0.3.4", features = ["cors"] }
 url = { version = "2.3.1", features = ["serde"] }
