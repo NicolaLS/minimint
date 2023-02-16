@@ -493,9 +493,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.1.0"
+version = "4.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa91278560fc226a5d9d736cc21e485ff9aad47d26b8ffe1f54cba868b684b9f"
+checksum = "ec0b0588d44d4d63a87dbd75c136c166bbfd9a86a31cb89e09906521c7d3f5e3"
 dependencies = [
  "bitflags",
  "clap_derive",
