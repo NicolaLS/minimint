@@ -251,7 +251,7 @@ js-sys = "0.3.69"
 jsonrpsee = "0.24.9"
 jsonrpsee-core = "0.24.9"
 jsonrpsee-types = "0.24.8"
-jsonrpsee-wasm-client = "0.24.9"
+jsonrpsee-wasm-client = "0.26.0"
 jsonrpsee-ws-client = { version = "0.24.9", default-features = false }
 ldk-node = { version = "0.6.1", package = "fedimint-ldk-node" }
 lightning = "0.1.3"
